@@ -49,13 +49,17 @@ if (! class_exists('Nexus_WP_GPL_Bootstrap_Navwalker')) {
 				}
 				$classes[]   = 'menu-item-' . $item->ID;
 				$class_names = join(' ', apply_filters('nav_menu_css_class', array_filter($classes), $item, $args, $depth));
-				if ($args->has_children) {
-					// $class_names .= ' dropdown';
+				if ($args->has_children && in_array($item->ID, $this->top_level_menu_items_that_have_grandchildren) === false) {
+					$class_names .= ' dropdown';
+				}
+				if (
+					in_array($item->ID, $this->top_level_menu_items_that_have_grandchildren) === true
+				) {
+					$class_names .= ' megamenu-dropdown';
 				}
 				if (preg_grep('/^current/', $classes)) {
 					$atts['aria-current'] = 'page';
 				}
-				// w-auto d-inline-block  me-3 me-lg-0 
 				$class_names = $class_names ? ' class="' . esc_attr($class_names) . '"' : '';
 
 				$id          = apply_filters('nav_menu_item_id', 'menu-item-' . $item->ID, $item, $args);
@@ -79,10 +83,10 @@ if (! class_exists('Nexus_WP_GPL_Bootstrap_Navwalker')) {
 					$atts['aria-expanded']  = 'false';
 				} else {
 					$atts['href'] = ! empty($item->url) ? $item->url : '';
-					if ($depth > 0) {
-						$atts['class'] = ''; // Dropdown item.
+					if ($depth == 0 && in_array($item->ID, $this->top_level_menu_items_that_have_grandchildren) === false) {
+						$atts['class'] = 'nav-link'; 
 					} else {
-						$atts['class'] = 'nav-link'; // First level.
+						$atts['class'] = 'nav-link';
 					}
 					if (in_array('current-menu-item', $classes)) {
 						$atts['class'] .= ' active';
